@@ -1,1 +1,2 @@
 # Battle-Royale-Simulation-Using-Heatmaps
+A simulation built in a 2d game world representing the top down map view of a Battle Royale game. The simulation imitates full rounds of a generic Battle Royale game, utilizing heatmaps that are heated up by a procedurally generated weather system, game object spawn locations and the AI pawns' actions during the simulation to control where the safe zone shrinks toward and where to spawn new game objects
