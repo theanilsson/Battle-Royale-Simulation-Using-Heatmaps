@@ -307,8 +307,7 @@ void Simulation::ShrinkSafeZone()
 	const Tga::Vector2f directionToTimeSpentInArea = (coldestSpotOnTimeSpentInArea - mySafeZone->GetCurrentPosition()).GetNormalized() * myHeatmapWeights[static_cast<int>(eHeatmapType::TimeSpentInArea)];
 	const Tga::Vector2f directionToLooted = (coldestSpotOnLooted - mySafeZone->GetCurrentPosition()).GetNormalized() * myHeatmapWeights[static_cast<int>(eHeatmapType::LootedSpots)];
 	const Tga::Vector2f directionToWeather = (coldestSpotOnWeather - mySafeZone->GetCurrentPosition()).GetNormalized() * myHeatmapWeights[static_cast<int>(eHeatmapType::Weather)];
-	
-	const Tga::Vector2f resultingDirection = (directionToDeaths + directionToTimeSpentInArea + directionToLooted + directionToWeather).GetNormalized();
+	Tga::Vector2f resultingDirection = (directionToDeaths + directionToTimeSpentInArea + directionToLooted + directionToWeather).GetNormalized();
 
 	MainSingleton::GetInstance()->GetPostMaster().TriggerMessage({ &resultingDirection , eMessageType::ShrinkSafeZone });
 	myShrinkSafeZoneTimer.Reset();
