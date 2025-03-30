@@ -4,7 +4,6 @@
 #include <tge\graphics\GraphicsEngine.h>
 #include <tge\texture\TextureManager.h>
 #include <tge\drawers\SpriteDrawer.h>
-#include <tge\drawers\DebugDrawer.h>
 #include "Heatmap.h"
 #include "MainSingleton.h"
 #include "AirDrop.h"
@@ -109,7 +108,6 @@ void Simulation::Receive(const Message& aMessage)
 void Simulation::Render()
 {
 	const Tga::Engine& engine = *Tga::Engine::GetInstance();
-	//Tga::DebugDrawer& debugDrawer = engine.GetDebugDrawer();
 	Tga::SpriteDrawer& spriteDrawer = engine.GetGraphicsEngine().GetSpriteDrawer();
 	mySelectionInfoText.Render();
 	myKeybindsText.Render();
@@ -137,10 +135,6 @@ void Simulation::Render()
 		airDrop->Render(spriteDrawer, myAirDropSpriteData);
 	}
 	mySafeZone->Render();
-	//debugDrawer.DrawCircle(savedDeathsPos, 100.0f * myHeatmapWeights[static_cast<int>(eHeatmapType::PlayerDeaths)], myHeatmapColors[static_cast<int>(eHeatmapType::PlayerDeaths)]);
-	//debugDrawer.DrawCircle(savedTimeSpentInAreaPos, 100.0f * myHeatmapWeights[static_cast<int>(eHeatmapType::TimeSpentInArea)], myHeatmapColors[static_cast<int>(eHeatmapType::TimeSpentInArea)]);
-	//debugDrawer.DrawCircle(savedLootedPos, 100.0f * myHeatmapWeights[static_cast<int>(eHeatmapType::LootedSpots)], myHeatmapColors[static_cast<int>(eHeatmapType::LootedSpots)]);
-	//debugDrawer.DrawCircle(savedWeatherPos, 100.0f * myHeatmapWeights[static_cast<int>(eHeatmapType::Weather)], myHeatmapColors[static_cast<int>(eHeatmapType::Weather)]);
 
 	if (myGameRoundTimer.IsDone())
 	{
@@ -308,18 +302,14 @@ void Simulation::ShrinkSafeZone()
 	const Tga::Vector2f coldestSpotOnTimeSpentInArea = myHeatmaps[static_cast<int>(eHeatmapType::TimeSpentInArea)]->GetColdestPoint();
 	const Tga::Vector2f coldestSpotOnLooted = myHeatmaps[static_cast<int>(eHeatmapType::LootedSpots)]->GetColdestPoint();
 	const Tga::Vector2f coldestSpotOnWeather = myHeatmaps[static_cast<int>(eHeatmapType::Weather)]->GetColdestPoint();
-	savedDeathsPos = coldestSpotOnDeaths;
-	savedTimeSpentInAreaPos = coldestSpotOnTimeSpentInArea;
-	savedLootedPos = coldestSpotOnLooted;
-	savedWeatherPos = coldestSpotOnWeather;
 
 	const Tga::Vector2f directionToDeaths = (coldestSpotOnDeaths - mySafeZone->GetCurrentPosition()).GetNormalized() * myHeatmapWeights[static_cast<int>(eHeatmapType::PlayerDeaths)];
 	const Tga::Vector2f directionToTimeSpentInArea = (coldestSpotOnTimeSpentInArea - mySafeZone->GetCurrentPosition()).GetNormalized() * myHeatmapWeights[static_cast<int>(eHeatmapType::TimeSpentInArea)];
 	const Tga::Vector2f directionToLooted = (coldestSpotOnLooted - mySafeZone->GetCurrentPosition()).GetNormalized() * myHeatmapWeights[static_cast<int>(eHeatmapType::LootedSpots)];
 	const Tga::Vector2f directionToWeather = (coldestSpotOnWeather - mySafeZone->GetCurrentPosition()).GetNormalized() * myHeatmapWeights[static_cast<int>(eHeatmapType::Weather)];
-	Tga::Vector2f direction = (directionToDeaths + directionToTimeSpentInArea + directionToLooted + directionToWeather).GetNormalized();
+	Tga::Vector2f resultingDirection = (directionToDeaths + directionToTimeSpentInArea + directionToLooted + directionToWeather).GetNormalized();
 
-	MainSingleton::GetInstance()->GetPostMaster().TriggerMessage({ &direction , eMessageType::ShrinkSafeZone });
+	MainSingleton::GetInstance()->GetPostMaster().TriggerMessage({ &resultingDirection , eMessageType::ShrinkSafeZone });
 	myShrinkSafeZoneTimer.Reset();
 }
 
@@ -393,11 +383,6 @@ void Simulation::UpdateSimulationEntities(const float aDeltaTime)
 				myHeatmaps[heatmapIndex]->Update(aDeltaTime, true, myHeatmapDiffusionRates[heatmapIndex]);
 				break;
 			}
-			case eHeatmapType::Weather:
-			case eHeatmapType::TimeSpentInArea:
-			{
-				break;
-			}
 		}
 	}
 }
@@ -440,16 +425,16 @@ void Simulation::HandleInterfaceInputs()
 {
 	Tga::Vector2ui windowSize = Tga::Engine::GetInstance()->GetWindowSize();
 	CU::InputManager& inputManager = MainSingleton::GetInstance()->GetInputManager();
-	savedMousePos = { static_cast<float>(inputManager.GetMousePosition().x), static_cast<float>(windowSize.y) - static_cast<float>(inputManager.GetMousePosition().y) };
+	mySavedMousePos = { static_cast<float>(inputManager.GetMousePosition().x), static_cast<float>(windowSize.y) - static_cast<float>(inputManager.GetMousePosition().y) };
 
 	if (inputManager.IsKeyHeld(CU::eKeyCode::LeftMouseButton) || inputManager.IsKeyDown(CU::eKeyCode::LeftMouseButton))
 	{
 		std::shared_ptr<Heatmap>& targetHeatmap = myGameRoundTimer.IsDone() ? myPreviousRoundHeatmaps[mySelectedHeatmap] : myHeatmaps[mySelectedHeatmap];
-		targetHeatmap->AddHeat(savedMousePos, 1.0f);
-		targetHeatmap->AddHeat(savedMousePos + Tga::Vector2f(20.0f, 0.0f), 1.0f);
-		targetHeatmap->AddHeat(savedMousePos + Tga::Vector2f(0.0f, 20.0f), 1.0f);
-		targetHeatmap->AddHeat(savedMousePos + Tga::Vector2f(-20.0f, 0.0f), 1.0f);
-		targetHeatmap->AddHeat(savedMousePos + Tga::Vector2f(0.0f, -20.0f), 1.0f);
+		targetHeatmap->AddHeat(mySavedMousePos, 1.0f);
+		targetHeatmap->AddHeat(mySavedMousePos + Tga::Vector2f(20.0f, 0.0f), 1.0f);
+		targetHeatmap->AddHeat(mySavedMousePos + Tga::Vector2f(0.0f, 20.0f), 1.0f);
+		targetHeatmap->AddHeat(mySavedMousePos + Tga::Vector2f(-20.0f, 0.0f), 1.0f);
+		targetHeatmap->AddHeat(mySavedMousePos + Tga::Vector2f(0.0f, -20.0f), 1.0f);
 	}
 
 	if (inputManager.IsKeyDown(CU::eKeyCode::Space) && myGameRoundTimer.IsDone())
