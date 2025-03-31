@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <random>
 
-// Talk about leaving cellscale as an inparameter here despite having it in SimulationCommon to allow for the possibility of different heatmaps to have different cell sizes if I were to develop the project further
 Heatmap::Heatmap(const Tga::Vector2f& aBottomLeftPoint, const float aCellScale, const Tga::Color& aColor) : myMainColor(aColor)
 {
 	myCellSprite.myTexture = Tga::Engine::GetInstance()->GetTextureManager().GetTexture(L"Sprites/CellSprite.dds");
@@ -128,7 +127,6 @@ void Heatmap::UpdateWeather()
 	delete copiedGrid;
 }
 
-// Talk about sending in position instead of indices to allow for the possibility of different heatmaps to have different cell sizes if I were to develop the project further
 void Heatmap::AddHeat(const Tga::Vector2f& aPosition, const float anAmount)
 {
 	const int cellX = static_cast<int>((aPosition.x - myCells[0][0].minPoint.x) / cellScale);
