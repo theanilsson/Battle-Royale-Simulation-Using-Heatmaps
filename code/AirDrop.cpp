@@ -1,4 +1,5 @@
 #include "AirDrop.h"
+#include "UtilityFunctions.h"
 #include <tge\drawers\SpriteDrawer.h>
 
 void AirDrop::Update(const float aDeltaTime)
@@ -6,10 +7,7 @@ void AirDrop::Update(const float aDeltaTime)
 	if (!myLandingTimer.IsDone())
 	{
 		myLandingTimer.Update(aDeltaTime);
-		if (myLandingTimer.IsDone())
-		{
-			myHasLanded = true;
-		}
+		mySpriteInstance.myPosition += mySavedWindDirection * myWindSpeed * aDeltaTime;
 	}
 }
 
@@ -25,11 +23,11 @@ const bool AirDrop::HasBeenLooted() const
 
 const bool AirDrop::HasLanded() const
 {
-	return myHasLanded;
+	return myLandingTimer.IsDone();
 }
 
 void AirDrop::Render(Tga::SpriteDrawer& aSpriteDrawer, const Tga::SpriteSharedData& aSpriteData)
 {
-	mySpriteInstance.myColor = myHasLanded ? Tga::Color(1.0f, 1.0f, 1.0f) : Tga::Color(1.0f, 1.0f, 1.0f, 0.3f);
+	mySpriteInstance.myColor = myLandingTimer.IsDone() ? Tga::Color(1.0f, 1.0f, 1.0f) : Tga::Color(1.0f, 1.0f, 1.0f, 0.3f);
 	if (!myHasBeenLooted) aSpriteDrawer.Draw(aSpriteData, mySpriteInstance);
 }

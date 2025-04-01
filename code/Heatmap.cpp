@@ -1,15 +1,14 @@
 #include "Heatmap.h"
 #include "AIPawn.h"
+#include "MainSingleton.h"
 #include "UtilityFunctions.h"
 #include <tge\engine.h>
 #include <tge\graphics\GraphicsEngine.h>
-#include <tge\drawers\LineDrawer.h>
-#include <tge\drawers\SpriteDrawer.h>
-#include <tge\primitives\LinePrimitive.h>
 #include <tge\texture\TextureManager.h>
-#include <queue>
+#include <tge\drawers\SpriteDrawer.h>
 #include <algorithm>
 #include <random>
+#include <queue>
 
 Heatmap::Heatmap(const Tga::Vector2f& aBottomLeftPoint, const float aCellScale, const Tga::Color& aColor) : myMainColor(aColor)
 {
@@ -125,6 +124,18 @@ void Heatmap::UpdateWeather()
 
 	myCells = *copiedGrid;
 	delete copiedGrid;
+}
+
+const float Heatmap::GetHeatAtPosition(const Tga::Vector2f& aPosition) const
+{
+	const int cellX = static_cast<int>((aPosition.x - myCells[0][0].minPoint.x) / cellScale);
+	const int cellY = static_cast<int>((aPosition.y - myCells[0][0].minPoint.y) / cellScale);
+
+	if (cellX >= 0 && cellX < gridWidth && cellY >= 0 && cellY < gridHeight)
+	{
+		return myCells[cellX][cellY].heat;
+	}
+	return 0.0f;
 }
 
 void Heatmap::AddHeat(const Tga::Vector2f& aPosition, const float anAmount)

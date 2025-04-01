@@ -44,6 +44,7 @@ constexpr float lootPileRadius = 10.0f;
 constexpr float airDropDetectionRange = 100.0f;
 constexpr float airDropRadius = 15.0f;
 constexpr float pickupRange = 10.0f;
+constexpr float windSpeedScalar = 75.0f;
 
 constexpr Tga::Vector2i neighborDirections[4] = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 constexpr std::array<float, static_cast<int>(eWeatherType::DefaultTypeAndCount)> weatherHeatValues = { 0.0f, 0.34f, 0.67f, 1.0f };

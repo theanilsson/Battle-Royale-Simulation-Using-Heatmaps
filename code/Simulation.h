@@ -62,7 +62,7 @@ private:
 	Tga::SpriteSharedData myMapSpriteData;
 	Tga::Sprite2DInstanceData myMapSpriteInstance;
 
-	Tga::Vector2f mySavedMousePos;
+	Tga::Vector2f mySavedMousePosition;
 	Tga::Vector2f myMapMin;
 	Tga::Vector2f myMapMax;
 

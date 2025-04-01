@@ -22,6 +22,7 @@ public:
 	void InitializeWeather();
 	void Update(const float aDeltaTime, const bool aShouldDiffuse, const float aDecayOrDiffusionRate);
 	void UpdateWeather();
+	const float GetHeatAtPosition(const Tga::Vector2f& aPosition) const;
 	void AddHeat(const Tga::Vector2f& aPosition, const float anAmount);
 	void ClearHeat();
 	const bool IsPositionCold(const Tga::Vector2f& aPosition) const;
