@@ -31,7 +31,6 @@ void Simulation::Initialize()
 	MainSingleton::GetInstance()->GetPostMaster().Subscribe(eMessageType::LootPickedUp, this);
 
 	InitializeTimers();
-	InitializeInterfaceTexts(renderSize);
 
 	LoadSprites(engine);
 	myMapSpriteInstance.myPivot = { 0.5f, 0.5f };
@@ -42,6 +41,7 @@ void Simulation::Initialize()
 	myMapMax = myMapSpriteInstance.myPosition + myMapSpriteInstance.mySize * 0.5f;
 	
 	InitializeHeatmaps();
+	InitializeInterfaceTexts(renderSize);
 	SpawnPawns();
 	SpawnLoot();
 	mySafeZone = std::make_shared<SafeZone>();
